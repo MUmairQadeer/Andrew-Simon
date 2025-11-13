@@ -131,7 +131,10 @@ function MobileStickyScroll({ services }) {
   useEffect(() => {
     const unsubscribe = scrollYProgress.onChange((latest) => {
       const numSections = services.length;
-      const newSection = Math.min(numSections - 1, Math.floor(latest * numSections));
+      const newSection = Math.min(
+        numSections - 1,
+        Math.floor(latest * numSections)
+      );
       setActiveSection(newSection);
     });
     return () => unsubscribe();
@@ -172,23 +175,63 @@ function MobileCard({ service }) {
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
+  const [isVideoPlaying, setIsVideoPlaying] = useState(true);
+  const iframeRef = useRef(null);
+
+  const toggleVideoPlayback = () => {
+    const newPlayState = !isVideoPlaying;
+    setIsVideoPlaying(newPlayState);
+    
+    if (iframeRef.current) {
+      // Use Vimeo Player API to control playback without reloading
+      const iframe = iframeRef.current;
+      const player = new window.Vimeo.Player(iframe);
+      
+      if (newPlayState) {
+        player.play().catch(error => {
+          console.log('Play failed:', error);
+        });
+      } else {
+        player.pause().catch(error => {
+          console.log('Pause failed:', error);
+        });
+      }
+    }
+  };
+
+  // Load Vimeo Player API script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://player.vimeo.com/api/player.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
   return (
-    <div className="relative w-full h-full bg-black">
+    <div 
+      className="relative w-full h-full bg-black"
+      onClick={toggleVideoPlayback}
+    >
       <div className="absolute inset-0 overflow-hidden">
         <iframe
+          ref={iframeRef}
           className="absolute inset-0 w-full h-full pointer-events-none"
           src={`${service.hoverVideo}&autoplay=1&loop=1&muted=1&background=1`}
           frameBorder="0"
           allow="autoplay; fullscreen; picture-in-picture"
           style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            width: '177.77vh',
-            height: '100vh',
-            transform: 'translate(-50%, -50%)',
-            minWidth: '100%',
-            minHeight: '100%'
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            width: "177.77vh",
+            height: "100vh",
+            transform: "translate(-50%, -50%)",
+            minWidth: "100%",
+            minHeight: "100%",
           }}
         />
         <div className="absolute inset-0 bg-black/70"></div>
@@ -201,10 +244,16 @@ function MobileCard({ service }) {
         variants={containerVariants}
       >
         <div className="h-full overflow-y-auto px-6 py-10">
-          <motion.h3 variants={itemVariants} className="text-4xl font-bold mb-6">
+          <motion.h3
+            variants={itemVariants}
+            className="text-4xl font-bold mb-6"
+          >
             {service.title}
           </motion.h3>
-          <motion.p variants={itemVariants} className="text-xl font-semibold mb-8">
+          <motion.p
+            variants={itemVariants}
+            className="text-xl font-semibold mb-8"
+          >
             {service.description}
           </motion.p>
           <ul className="list-disc list-outside space-y-5 text-lg font-medium ml-5 pb-20">
@@ -232,6 +281,42 @@ function ServicePanel({ service, isActive, onHover, titleHeight }) {
     visible: { opacity: 1, transition: { delay: 0.3, duration: 0.5 } },
   };
 
+  const [isVideoPlaying, setIsVideoPlaying] = useState(true);
+  const iframeRef = useRef(null);
+
+  const toggleVideoPlayback = () => {
+    const newPlayState = !isVideoPlaying;
+    setIsVideoPlaying(newPlayState);
+    
+    if (iframeRef.current) {
+      // Use Vimeo Player API to control playback without reloading
+      const iframe = iframeRef.current;
+      const player = new window.Vimeo.Player(iframe);
+      
+      if (newPlayState) {
+        player.play().catch(error => {
+          console.log('Play failed:', error);
+        });
+      } else {
+        player.pause().catch(error => {
+          console.log('Pause failed:', error);
+        });
+      }
+    }
+  };
+
+  // Load Vimeo Player API script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://player.vimeo.com/api/player.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
   return (
     <motion.div
       className="relative h-full overflow-hidden cursor-pointer"
@@ -240,22 +325,24 @@ function ServicePanel({ service, isActive, onHover, titleHeight }) {
       variants={desktopPanelVariants}
       transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
       onMouseEnter={onHover}
+      onClick={toggleVideoPlayback}
     >
       <div className="absolute inset-0 z-0">
         <iframe
+          ref={iframeRef}
           className="absolute inset-0 w-full h-full pointer-events-none"
           src={`${service.hoverVideo}&autoplay=1&loop=1&muted=1&background=1`}
           frameBorder="0"
           allow="autoplay; fullscreen; picture-in-picture"
           style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            width: '177.77vh',
-            height: '100vh',
-            transform: 'translate(-50%, -50%)',
-            minWidth: '100%',
-            minHeight: '100%'
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            width: "177.77vh",
+            height: "100vh",
+            transform: "translate(-50%, -50%)",
+            minWidth: "100%",
+            minHeight: "100%",
           }}
         />
         <div className="absolute inset-0 bg-black/80"></div>
@@ -280,7 +367,9 @@ function ServicePanel({ service, isActive, onHover, titleHeight }) {
           animate={isActive ? "visible" : "hidden"}
           variants={desktopTextVariants}
         >
-          <p className="text-xl sm:text-2xl font-semibold">{service.description}</p>
+          <p className="text-xl sm:text-2xl font-semibold">
+            {service.description}
+          </p>
           <ul className="list-disc list-outside space-y-12 text-xl sm:text-2xl font-semibold ml-5">
             {service.points.map((point, i) => (
               <li key={i}>{point}</li>

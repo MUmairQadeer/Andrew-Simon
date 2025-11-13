@@ -102,12 +102,12 @@ function HeroSection() {
 // --- STICKY SCROLL FEATURE ---
 function StickyScrollFeature() {
   const [activeSection, setActiveSection] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
   const [isClickScrolling, setIsClickScrolling] = useState(false);
 
   const scrollRef = useRef(null);
   const iframeRef = useRef(null);
   const playerRef = useRef(null);
+  const playStatesRef = useRef(featureData.map(() => true));
   const scrollTimeout = useRef(null);
   const { scrollYProgress } = useScroll({ target: scrollRef, offset: ['start 0.1', 'end 1'] });
 
@@ -122,30 +122,82 @@ function StickyScrollFeature() {
     return () => unsubscribe();
   }, [scrollYProgress, isClickScrolling]);
 
-  // --- Vimeo Player Initialization ---
+  // --- Initialize/Update Player when activeSection changes ---
   useEffect(() => {
-    if (iframeRef.current) {
-      if (playerRef.current) playerRef.current.destroy();
-      const newPlayer = new Player(iframeRef.current);
-      newPlayer.setVolume(0);
-      newPlayer.play();
-      playerRef.current = newPlayer;
-      setIsPlaying(true);
-    }
-    return () => {
+    const initializePlayer = async () => {
+      if (!iframeRef.current) return;
+
+      // Clean up previous player
       if (playerRef.current) {
-        playerRef.current.destroy();
-        playerRef.current = null;
+        try {
+          playerRef.current.destroy();
+        } catch (error) {
+          console.log('Error destroying previous player:', error);
+        }
+      }
+
+      try {
+        const player = new Player(iframeRef.current);
+        await player.setVolume(0);
+        
+        // Set the play state based on stored state for this section
+        if (playStatesRef.current[activeSection]) {
+          await player.play();
+        } else {
+          await player.pause();
+        }
+        
+        playerRef.current = player;
+      } catch (error) {
+        console.log('Error initializing Vimeo player:', error);
       }
     };
+
+    // Small timeout to ensure iframe is mounted
+    const timer = setTimeout(initializePlayer, 100);
+    return () => clearTimeout(timer);
   }, [activeSection]);
 
+  // --- Cleanup player on unmount ---
+  useEffect(() => {
+    return () => {
+      if (playerRef.current) {
+        try {
+          playerRef.current.destroy();
+        } catch (error) {
+          console.log('Error cleaning up player:', error);
+        }
+      }
+    };
+  }, []);
+
   // --- Toggle Play ---
-  const togglePlay = () => {
+  const togglePlay = async () => {
     if (!playerRef.current) return;
-    if (isPlaying) playerRef.current.pause();
-    else playerRef.current.play();
-    setIsPlaying(!isPlaying);
+
+    try {
+      const currentPlayState = playStatesRef.current[activeSection];
+      
+      if (currentPlayState) {
+        await playerRef.current.pause();
+      } else {
+        await playerRef.current.play();
+      }
+      
+      // Update the play state for current section
+      playStatesRef.current[activeSection] = !currentPlayState;
+    } catch (error) {
+      console.log('Error toggling play state:', error);
+    }
+  };
+
+  // --- Click Handler for Card ---
+  const handleCardClick = (e) => {
+    // Prevent triggering if it's a heading click for scrolling
+    if (e.target.tagName === 'H2' || e.target.closest('h2')) {
+      return;
+    }
+    togglePlay();
   };
 
   // --- Click Heading Scroll ---
@@ -216,7 +268,10 @@ function StickyScrollFeature() {
 
           {/* RIGHT COLUMN */}
           <div className="md:col-span-2 w-full flex md:h-[80vh] items-center md:justify-center">
-            <div className="w-full md:w-[80%] h-[45vh] md:h-full rounded-2xl overflow-hidden shadow-2xl mx-auto relative">
+            <div 
+              className="w-full md:w-[80%] h-[45vh] md:h-full rounded-2xl overflow-hidden shadow-2xl mx-auto relative cursor-pointer"
+              onClick={handleCardClick}
+            >
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeSection}
@@ -232,16 +287,8 @@ function StickyScrollFeature() {
                     aria-hidden="true"
                     style={{ zIndex: 0 }}
                   >
-                    {/*
-                      Strategy:
-                      - Place iframe absolutely centered (top:50% left:50%), translate(-50%,-50%)
-                      - Force rendered iframe dimensions to be larger than the container (150%),
-                        ensuring it always overflows and covers the card regardless of aspect ratio.
-                      - Use minWidth/minHeight to handle extremes.
-                    */}
                     <iframe
                       ref={iframeRef}
-                      key={featureData[activeSection].videoSrc}
                       src={featureData[activeSection].videoSrc}
                       title="vimeo-player"
                       allow="autoplay; fullscreen; muted"
@@ -251,8 +298,8 @@ function StickyScrollFeature() {
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: '150%',        // aggressively larger than container
-                        height: '150%',       // aggressively larger than container
+                        width: '150%',
+                        height: '150%',
                         minWidth: '150%',
                         minHeight: '150%',
                         maxWidth: '300%',
@@ -262,33 +309,11 @@ function StickyScrollFeature() {
                     />
                   </div>
 
-                  {/* overlay / click-to-toggle */}
+                  {/* overlay - now just for visual, click handled by parent */}
                   <div
-                    className="absolute inset-0 bg-black/80 cursor-pointer"
-                    onClick={togglePlay}
-                    role="button"
-                    aria-label={isPlaying ? 'Pause video' : 'Play video'}
+                    className="absolute inset-0 bg-black/80"
                     style={{ zIndex: 10 }}
-                  >
-                    <AnimatePresence>
-                      {!isPlaying && (
-                        <motion.div
-                          className="absolute inset-0 flex items-center justify-center"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                        >
-                          <svg
-                            className="w-16 h-16 text-white opacity-75"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M4.018 15.59a.75.75 0 001.127.643l10.455-6.036a.75.75 0 000-1.286L5.145 2.767a.75.75 0 00-1.127.643v12.18z" />
-                          </svg>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
+                  />
 
                   <motion.ul
                     className="relative z-20 flex flex-col px-6 pt-12 sm:p-8 md:p-12 text-white"
