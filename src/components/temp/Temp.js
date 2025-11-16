@@ -75,7 +75,7 @@ function useIsMobile() {
 export default function Index() {
   const [activeIndex, setActiveIndex] = useState(null);
   const isMobile = useIsMobile();
-  const titleHeight = "120px";
+  const titleHeight = "50px";
   const colors = {
     lightText: "#F9FAFB",
   };
@@ -84,7 +84,7 @@ export default function Index() {
     <div className="flex flex-col items-center w-full bg-[#0d0d19]">
       {isMobile ? (
         <>
-          <div className="sticky top-0 z-20 w-full bg-[#0d0d19] p-4 flex justify-center shadow-lg">
+          <div className="sticky top-0 z-20 w-full bg-[#0d0d19] py-8 flex justify-center shadow-lg">
             <h2 className="text-4xl font-bold text-white">Our Services</h2>
           </div>
           <MobileStickyScroll services={servicesData} colors={colors} />
@@ -99,7 +99,7 @@ export default function Index() {
 
           <div
             onMouseLeave={() => setActiveIndex(null)}
-            className="flex md:flex-row h-auto md:h-[700px] xl:h-[850px] w-full max-w-7xl md:rounded-2xl md:overflow-hidden md:shadow-2xl"
+            className="flex md:flex-row h-auto h-[100vh] md:h-[700px] xl:h-[800px] w-full max-w-7xl md:rounded-2xl md:overflow-hidden md:shadow-2xl "
           >
             {servicesData.map((service, index) => (
               <ServicePanel
@@ -166,6 +166,7 @@ function MobileStickyScroll({ services, colors }) {
 }
 
 // --- MOBILE CARD COMPONENT ---
+// --- MOBILE CARD COMPONENT ---
 function MobileCard({ service, colors }) {
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -184,18 +185,8 @@ function MobileCard({ service, colors }) {
     setIsVideoPlaying(newPlayState);
 
     if (iframeRef.current) {
-      const iframe = iframeRef.current;
-      const player = new window.Vimeo.Player(iframe);
-
-      if (newPlayState) {
-        player.play().catch((error) => {
-          console.log("Play failed:", error);
-        });
-      } else {
-        player.pause().catch((error) => {
-          console.log("Pause failed:", error);
-        });
-      }
+      const player = new window.Vimeo.Player(iframeRef.current);
+      newPlayState ? player.play() : player.pause();
     }
   };
 
@@ -204,14 +195,14 @@ function MobileCard({ service, colors }) {
     script.src = "https://player.vimeo.com/api/player.js";
     script.async = true;
     document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
+    return () => document.body.removeChild(script);
   }, []);
 
   return (
-    <div className="relative w-full h-full bg-black" onClick={toggleVideoPlayback}>
+    <div
+      className="relative w-full h-full bg-black flex flex-col p-4"
+      onClick={toggleVideoPlayback}
+    >
       <div className="absolute inset-0 overflow-hidden">
         <iframe
           ref={iframeRef}
@@ -219,7 +210,7 @@ function MobileCard({ service, colors }) {
           src={`${service.hoverVideo}&autoplay=1&loop=1&muted=1&background=1`}
           frameBorder="0"
           allow="autoplay; fullscreen; picture-in-picture"
-          loading="lazy" // Added lazy loading
+          loading="lazy"
           style={{
             position: "absolute",
             top: "50%",
@@ -234,45 +225,41 @@ function MobileCard({ service, colors }) {
         <div className="absolute inset-0 bg-black/70"></div>
       </div>
 
-      <motion.div
-        className="relative z-10 h-full w-full flex flex-col justify-end text-white"
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-      >
-        <div className="h-full overflow-y-auto px-6 py-10">
-          <motion.h3 variants={itemVariants} className="text-4xl font-bold mb-2">
+     <motion.div
+  className="relative z-10 h-full w-full flex flex-col justify-center text-white"
+  initial="hidden"
+  animate="visible"
+  variants={containerVariants}
+>
+
+<div className="flex flex-col space-y-4 px-2">
+          <motion.h3 variants={itemVariants} className="text-2xl font-bold">
             {service.title}
           </motion.h3>
 
-          {/* Line below heading REMOVED */}
-
-          <motion.p
-            variants={itemVariants}
-            className="text-xl font-semibold italic mb-4"
-          >
-            {service.description}
-          </motion.p>
-
-          {/* Divider line - MOVED & CENTERED */}
           <motion.div
             variants={itemVariants}
-            className="w-28 h-1 rounded-full mb-6 mx-auto" // Increased from w-24
+            className="w-20 h-1 rounded-full"
             style={{
               background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
             }}
           />
 
-          <ul className="list-disc list-outside space-y-5 text-lg font-medium ml-5 pb-6 marker:text-[#764ba2]">
+          <motion.p variants={itemVariants} className="text-lg font-semibold italic">
+            {service.description}
+          </motion.p>
+
+          <ul className="list-disc list-outside space-y-8 text-base font-medium ml-4 marker:text-[#764ba2]">
             {service.points.map((point, i) => (
               <motion.li key={i} variants={itemVariants}>
                 {point}
               </motion.li>
             ))}
           </ul>
-          {/* Button */}
+
+          {/* Button directly after content, small margin above */}
           <motion.a
-            className="font-semibold text-[0.9rem] py-2 px-5 rounded-full mt-4 sm:mt-6 shadow-lg inline-block"
+  className="font-semibold text-[0.9rem] py-2 px-5 rounded-full shadow-lg self-center mt-8"
             style={{
               backgroundImage: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
               color: colors.lightText,
@@ -290,6 +277,7 @@ function MobileCard({ service, colors }) {
     </div>
   );
 }
+
 
 // --- DESKTOP PANEL ---
 function ServicePanel({ service, isActive, onHover, titleHeight, colors }) {
@@ -370,45 +358,46 @@ function ServicePanel({ service, isActive, onHover, titleHeight, colors }) {
       </div>
 
       <motion.div
-        className="absolute bottom-0 left-0 right-0 z-20 text-white h-full flex flex-col"
+        className="absolute bottom-0 left-0 right-0 z-20 text-white h-full flex flex-col py-20"
         style={{ overflowY: "hidden" }}
         variants={desktopContentVariants}
         transition={{ duration: 0.5, ease: "easeInOut" }}
       >
         <h3
-          className="text-3xl sm:text-4xl font-bold w-full flex items-center shrink-0 px-4 sm:px-6"
+          className="text-3xl sm:text-4xl font-bold w-full flex items-center shrink-0 px-6"
           style={{ height: titleHeight }}
         >
           {service.title}
         </h3>
 
-        {/* New line below heading for desktop REMOVED */}
-
         <motion.div
-          className="space-y-6 pt-2 px-4 pb-4 sm:pt-4 sm:px-6 sm:pb-6"
+          className="flex flex-col flex-grow pt-4 px-6 pb-6"
           initial="hidden"
           animate={isActive ? "visible" : "hidden"}
           variants={desktopTextVariants}
         >
-          <p className="text-xl sm:text-2xl font-semibold italic">{service.description}</p>
-          
-          {/* Divider line - MOVED & CENTERED */}
-          <div
-            className="w-32 h-1 rounded-full mx-auto" // Increased from w-24 to w-32
-            style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            }}
-          />
+          {/* Top content wrapper with consistent spacing */}
+          <div className="space-y-6">
+            {/* Divider line - Left aligned, removed 'my-3' */}
+            <div
+              className="w-32 h-1 rounded-full"
+              style={{
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              }}
+            />
 
-          <ul className="list-disc list-outside space-y-4 text-xl sm:text-2xl font-semibold ml-5 marker:text-[#764ba2]">
-            {service.points.map((point, i) => (
-              <li key={i}>{point}</li>
-            ))}
-          </ul>
+            <p className="text-lg xl:text-xl font-semibold italic">{service.description}</p>
 
-          {/* Button */}
+            <ul className="list-disc list-outside space-y-3 text-lg xl:text-xl font-semibold ml-5 marker:text-[#764ba2]">
+              {service.points.map((point, i) => (
+                <li key={i}>{point}</li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Button - Now sits naturally, self-center, with 'mt-10' */}
           <motion.a
-            className="font-semibold text-[0.9rem] py-2 px-5 rounded-full mt-4 sm:mt-6 shadow-lg inline-block"
+            className="font-semibold text-[0.9rem] py-2 px-5 rounded-full mt-10 shadow-lg inline-block w-[50%]"
             style={{
               backgroundImage: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
               color: colors.lightText,

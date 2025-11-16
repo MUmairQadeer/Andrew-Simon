@@ -193,8 +193,11 @@ function StickyScrollFeature() {
   return (
     <div ref={scrollRef} className="relative" style={{ height: `${featureData.length * 100}vh` }}>
       <div
-        className="sticky w-full overflow-hidden"
-        style={{ backgroundColor: colors.primaryBlue, color: colors.lightText, top: "10vh", height: "90vh" }}
+        className="sticky w-full overflow-hidden md:h-[90vh] h-[105vh]"
+        style={{ backgroundColor: colors.primaryBlue, color: colors.lightText, top: "10vh", 
+          // height: "90vh"
+
+         }}
       >
         <div className="max-w-7xl mx-auto h-full md:grid md:grid-cols-3 gap-6 md:gap-12 lg:gap-24 md:items-center px-6 md:px-8">
           {/* LEFT COLUMN */}

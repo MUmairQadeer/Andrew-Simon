@@ -10,32 +10,36 @@ export default function CardScrollItem({
   targetScale,
 }) {
   const scale = useTransform(progress, range, [1, targetScale]);
+  // Transform the background color based on the progress
+  const backgroundColor = useTransform(progress, range, [
+    "rgba(19, 29, 48, 0.8)", // Darker for cards further down
+    "rgba(25, 36, 59, 1)", // More opaque for the active card
+  ]);
 
   return (
     <div className="card-container w-full flex justify-center">
       <motion.div
-        style={{ top: `calc(-4% + ${idx * 25}px)`, scale: scale }}
+        style={{ top: `calc(-4% + ${idx * 25}px)`, scale, backgroundColor }}
         className="card-content relative w-full max-w-4xl h-[350px] md:h-[500px] 
-                   rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row 
-                   items-center text-white border border-white/10"
+                       rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row 
+                       items-center text-white border border-white/10"
       >
         {/* --- Improved text readability overlay --- */}
         <div
           className="absolute inset-0 bg-gradient-to-r 
-                     from-black/70 via-black/55 to-black/25 
-                     backdrop-blur-sm"
+                       from-black/50 via-black/35 to-black/15 
+                       backdrop-blur-sm"
           style={{ zIndex: 0 }}
         ></div>
 
         {/* --- CARD TEXT --- */}
         <div className="relative w-full md:w-3/5 p-4 md:p-8 flex flex-col justify-center h-full 
-                        text-center md:text-left z-10">
-
+                         text-center md:text-left z-10">
           {project.description.map((line, index) => (
             <p
               key={index}
               className="text-[.8rem] md:text-lg !leading-normal mb-2 xl:mb-4 
-                         xl:text-[1.3rem] xl:!leading-tight drop-shadow-md"
+                           xl:text-[1.3rem] xl:!leading-tight drop-shadow-md"
             >
               {line}
             </p>
@@ -45,7 +49,7 @@ export default function CardScrollItem({
           {project.linkText && (
             <motion.a
               className="font-semibold text-[0.9rem] py-2 px-5 rounded-full mt-4 sm:mt-6 
-                         shadow-lg inline-block self-center md:self-start"
+                           shadow-lg inline-block self-center md:self-start"
               style={{
                 backgroundImage:
                   "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
@@ -65,7 +69,7 @@ export default function CardScrollItem({
           {idx === 2 && (
             <motion.a
               className="font-semibold text-[0.9rem] py-2 px-5 rounded-full mt-4 sm:mt-4 
-                         shadow-lg inline-block self-center md:self-start"
+                           shadow-lg inline-block self-center md:self-start"
               style={{
                 backgroundImage:
                   "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
