@@ -35,16 +35,43 @@ const PauseIcon = ({ className = "w-6 h-6" }) => (
 );
 
 const MuteIcon = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.5 5.05a7 7 0 014.242 12.428M11.5 5.05V19m0-13.95a7 7 0 00-4.243 12.428m4.242-12.428L9 3m2.5 2.05L15 3m-3.5 2.05V1m0 4.05L9 7m2.5-1.95L15 7M3 10v4c0 1.105.895 2 2 2h2l5 5V3L7 8H5c-1.105 0-2 .895-2 2zm16 0l-4 4m0-4l4 4" />
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/>
+    <line x1="22" y1="9" x2="16" y2="15" />
+    <line x1="16" y1="9" x2="22" y2="15" />
   </svg>
 );
 
+
+
+
 const UnmuteIcon = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072M17.657 6.343a9 9 0 010 12.728M3 10v4c0 1.105.895 2 2 2h2l5 5V3L7 8H5c-1.105 0-2 .895-2 2z" />
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/>
+    <path d="M16 9a5 5 0 0 1 0 6"/>
+    <path d="M19.364 18.364a9 9 0 0 0 0-12.728"/>
   </svg>
 );
+
+
 
 
 // --- Typing Effect ---
@@ -91,7 +118,7 @@ const TypingEffect = () => {
 export default function CinematicPromo() {
   // const [showPlayButton, setShowPlayButton] = useState(true); // REMOVED
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true); // Start muted
+  const [isMuted, setIsMuted] = useState(false); // Start muted
   const [showControls, setShowControls] = useState(true); // CHANGED: Show controls from start
   const videoRef = useRef(null);
   const targetRef = useRef(null);

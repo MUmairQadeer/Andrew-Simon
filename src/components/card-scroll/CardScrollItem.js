@@ -34,7 +34,7 @@ export default function CardScrollItem({
           {project.description.map((line, index) => (
             <p
               key={index}
-              className="text-sm md:text-lg !leading-normal mb-2 xl:mb-4 
+              className="text-[.8rem] md:text-lg !leading-normal mb-2 xl:mb-4 
                          xl:text-[1.3rem] xl:!leading-tight drop-shadow-md"
             >
               {line}
