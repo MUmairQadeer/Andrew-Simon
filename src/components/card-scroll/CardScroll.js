@@ -92,7 +92,10 @@ export default function CardScroll() {
             />
           );
         })}
+            <div className="h-[40vh] w-full"></div>
+
       </div>
+      
     </motion.section>
   );
 }

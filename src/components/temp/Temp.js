@@ -219,6 +219,7 @@ function MobileCard({ service, colors }) {
           src={`${service.hoverVideo}&autoplay=1&loop=1&muted=1&background=1`}
           frameBorder="0"
           allow="autoplay; fullscreen; picture-in-picture"
+          loading="lazy" // Added lazy loading
           style={{
             position: "absolute",
             top: "50%",
@@ -244,14 +245,7 @@ function MobileCard({ service, colors }) {
             {service.title}
           </motion.h3>
 
-          {/* New line below heading for mobile - NO SCALE */}
-          <motion.div
-            variants={itemVariants}
-            className="w-28 h-1 rounded-full mb-4" // Increased from w-24
-            style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            }}
-          />
+          {/* Line below heading REMOVED */}
 
           <motion.p
             variants={itemVariants}
@@ -360,6 +354,7 @@ function ServicePanel({ service, isActive, onHover, titleHeight, colors }) {
           src={`${service.hoverVideo}&autoplay=1&loop=1&muted=1&background=1`}
           frameBorder="0"
           allow="autoplay; fullscreen; picture-in-picture"
+          loading="lazy" // Added lazy loading
           style={{
             position: "absolute",
             top: "50%",
@@ -387,17 +382,7 @@ function ServicePanel({ service, isActive, onHover, titleHeight, colors }) {
           {service.title}
         </h3>
 
-        {/* New line below heading for desktop - with scale animation */}
-        <motion.div
-          initial={{ scaleX: 0 }}
-          animate={isActive ? { scaleX: 1 } : { scaleX: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          style={{
-            transformOrigin: "left",
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-          }}
-          className="w-32 h-1 rounded-full mb-4 px-4 sm:px-6 ml-6" // Kept at w-32
-        />
+        {/* New line below heading for desktop REMOVED */}
 
         <motion.div
           className="space-y-6 pt-2 px-4 pb-4 sm:pt-4 sm:px-6 sm:pb-6"

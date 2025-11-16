@@ -320,10 +320,10 @@ function StickyScrollFeature() {
           </div>
 
           {/* MOBILE BUTTON */}
-          <div className="inline-block md:hidden pt-10 pb-16">
-            <p className="text-xs text-gray-300">All services supported by our money-back 100% satisfaction guarantee.</p>
+          <div className="inline-block md:hidden pt-4 pb-20 flex flex-col  items-center w-full">
+            <p className="text-sm text-gray-300 px-4">All services supported by our money-back 100% satisfaction guarantee.</p>
             <motion.a
-              className="font-semibold text-[0.9rem] py-2 px-5 rounded-full mt-4 shadow-lg w-full"
+              className="font-semibold text-[1rem] py-2 px-4 rounded-full mt-4 shadow-lg w-[95%] text-center "
               style={{ backgroundImage: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", color: colors.lightText }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
