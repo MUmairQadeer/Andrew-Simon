@@ -1,13 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-
-// --- Config ---
-// NOTE: I've replaced your local video with a placeholder.
-// Just swap this URL back to your './Promo.mp4' import.
 import PromoVideo from './Promo.mp4';
 import VIDEO_THUMBNAIL from './video-thumbnail.png';
-// const PromoVideo = "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4";
-// const VIDEO_THUMBNAIL = "https://via.placeholder.com/1920x1080/000000/FFFFFF?text=Video+Thumbnail"; // Placeholder thumbnail
+// --- Config ---
 
 const TYPING_WORDS = ["Pitch", "Speech", "Presentation", "Moment", "Talk"];
 const FONT_FAMILY = 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"';
@@ -51,9 +46,6 @@ const MuteIcon = ({ className = "w-6 h-6" }) => (
   </svg>
 );
 
-
-
-
 const UnmuteIcon = ({ className = "w-6 h-6" }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -70,9 +62,6 @@ const UnmuteIcon = ({ className = "w-6 h-6" }) => (
     <path d="M19.364 18.364a9 9 0 0 0 0-12.728" />
   </svg>
 );
-
-
-
 
 // --- Typing Effect ---
 const TypingEffect = () => {
@@ -106,7 +95,7 @@ const TypingEffect = () => {
   return (
     <span
       className="inline-block transition-all duration-100 min-h-[1em]"
-      style={headTextStyle} // Applied gradient text style
+      style={headTextStyle}
     >
       {text}
       <span className="opacity-50 animate-pulse" style={{ color: '#764ba2' }}>_</span>
@@ -116,13 +105,12 @@ const TypingEffect = () => {
 
 // --- Main Cinematic Promo ---
 export default function CinematicPromo() {
-  // const [showPlayButton, setShowPlayButton] = useState(true); // REMOVED
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false); // Start muted
-  const [showControls, setShowControls] = useState(true); // CHANGED: Show controls from start
+  const [isMuted, setIsMuted] = useState(false);
+  const [showControls, setShowControls] = useState(true);
   const videoRef = useRef(null);
   const targetRef = useRef(null);
-  const controlsTimeoutRef = useRef(null); // Ref for the auto-hide timer
+  const controlsTimeoutRef = useRef(null);
 
   const { scrollYProgress } = useScroll({
     target: targetRef,
@@ -133,48 +121,34 @@ export default function CinematicPromo() {
   const TEXT_FADE_OUT_END = 0.4;
   const CARD_ANIMATION_START = 0.0;
   const CARD_ANIMATION_END = 0.7;
-  const SLIDE_TEXT_ANIMATION_START = 0.6;
-  const SLIDE_TEXT_ANIMATION_END = 0.8;
 
   // Hero text moves up and fades
   const text1Y = useTransform(scrollYProgress, [0, TEXT_FADE_OUT_END], ["0vh", "-50vh"]);
   const text1Opacity = useTransform(scrollYProgress, [0, TEXT_FADE_OUT_END], [1, 0]);
 
   // Video card position & scale
+  // CHANGED: Maximum scale changed from 1 to 0.75
   const videoCardY = useTransform(scrollYProgress, [CARD_ANIMATION_START, CARD_ANIMATION_END], ["60vh", "0vh"]);
-  const videoCardScale = useTransform(scrollYProgress, [CARD_ANIMATION_START, CARD_ANIMATION_END], [0.5, 1]);
+  const videoCardScale = useTransform(scrollYProgress, [CARD_ANIMATION_START, CARD_ANIMATION_END], [0.5, 0.75]);
 
   // Dark overlay opacity
   const overlayOpacity = useTransform(scrollYProgress, [0.4, CARD_ANIMATION_END], [0, 0.6]);
 
-  // Sliding text transforms
-  const textTopX = useTransform(scrollYProgress, [SLIDE_TEXT_ANIMATION_START, SLIDE_TEXT_ANIMATION_END], ["-100%", "0%"]);
-  const textBottomX = useTransform(scrollYProgress, [SLIDE_TEXT_ANIMATION_START, SLIDE_TEXT_ANIMATION_END], ["100%", "0%"]);
-
-  // Separate opacity for top & bottom text
-  const textTopOpacity = useTransform(scrollYProgress, [SLIDE_TEXT_ANIMATION_START, SLIDE_TEXT_ANIMATION_END], [0, 1]);
-  const textBottomOpacity = useTransform(scrollYProgress, [SLIDE_TEXT_ANIMATION_START, SLIDE_TEXT_ANIMATION_END], [0, 1]);
-
   // --- Controls Visibility Logic ---
   const showAndAutoHideControls = () => {
-    // Clear any existing timer
     if (controlsTimeoutRef.current) {
       clearTimeout(controlsTimeoutRef.current);
     }
-    // Show the controls
     setShowControls(true);
-    // Set a new timer to hide them
     controlsTimeoutRef.current = setTimeout(() => {
       setShowControls(false);
-    }, 2000); // CHANGED: Hide after 2 seconds
+    }, 2000);
   };
 
   // --- Video Control Handlers ---
-  // const handlePlay = async () => { ... }; // REMOVED: This logic is merged into handleVideoContainerClick
-
   const togglePlayPause = async (e) => {
-    e.stopPropagation(); // Stop click from bubbling to container
-    showAndAutoHideControls(); // Reset the auto-hide timer
+    e.stopPropagation();
+    showAndAutoHideControls();
     if (videoRef.current) {
       try {
         if (videoRef.current.paused) {
@@ -184,7 +158,7 @@ export default function CinematicPromo() {
         }
       } catch (err) {
         if (err.name === 'AbortError') {
-          console.log("Video toggle aborted (this is often fine)");
+          console.log("Video toggle aborted");
         } else {
           console.error("Error toggling video:", err);
         }
@@ -193,8 +167,8 @@ export default function CinematicPromo() {
   };
 
   const toggleMute = (e) => {
-    e.stopPropagation(); // Stop click from bubbling to container
-    showAndAutoHideControls(); // Reset the auto-hide timer
+    e.stopPropagation();
+    showAndAutoHideControls();
     if (videoRef.current) {
       const currentMuted = videoRef.current.muted;
       videoRef.current.muted = !currentMuted;
@@ -203,30 +177,20 @@ export default function CinematicPromo() {
   };
 
   const handleVideoContainerClick = async () => {
-    // if (showPlayButton) return; // REMOVED
-
-    // 1. Show/Reset timer for mute button
     showAndAutoHideControls();
-
-    // 2. Perform the play/pause logic
     if (videoRef.current) {
       try {
-        // NEW: Unmute on first play
         if (videoRef.current.muted) {
           videoRef.current.muted = false;
           setIsMuted(false);
         }
-
-        // Toggle play/pause
         if (videoRef.current.paused) {
           await videoRef.current.play();
         } else {
           videoRef.current.pause();
         }
       } catch (err) {
-        if (err.name === 'AbortError') {
-          console.log("Video toggle aborted (this is often fine)");
-        } else {
+        if (err.name !== 'AbortError') {
           console.error("Error toggling video:", err);
         }
       }
@@ -244,7 +208,7 @@ export default function CinematicPromo() {
         style={{ background: 'linear-gradient(180deg, #000000 20%, #2a2a4e 100%)' }}
       >
 
-        {/* Hero Text */}
+        {/* Hero Text (Initial Title) */}
         <motion.div
           style={{ y: text1Y, opacity: text1Opacity }}
           className="absolute inset-0 z-30 flex items-center justify-center will-change-transform"
@@ -264,10 +228,9 @@ export default function CinematicPromo() {
           className="absolute top-0 w-full h-full flex items-center justify-center will-change-transform"
         >
           <div
-            className="relative w-full h-full overflow-hidden rounded-lg cursor-pointer" // Added cursor-pointer
-            onClick={handleVideoContainerClick} // Click handler on the whole container
+            className="relative w-full h-full overflow-hidden rounded-lg cursor-pointer"
+            onClick={handleVideoContainerClick}
           >
-
             {/* Video */}
             <video
               ref={videoRef}
@@ -281,7 +244,6 @@ export default function CinematicPromo() {
               onPause={() => setIsPlaying(false)}
               onEnded={() => {
                 setIsPlaying(false);
-                // CHANGED: Show controls and keep them visible on end
                 if (controlsTimeoutRef.current) {
                   clearTimeout(controlsTimeoutRef.current);
                 }
@@ -295,42 +257,15 @@ export default function CinematicPromo() {
             {/* Dark overlay */}
             <motion.div style={{ opacity: overlayOpacity }} className="absolute inset-0 bg-black z-10 will-change-transform" />
 
-            {/* Sliding Text (Above overlay) */}
-            <div className="absolute inset-0 z-20 pointer-events-none">
-              <motion.h2
-                className="absolute top-20 left-8 md:top-24 md:left-12 text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold will-change-transform whitespace-nowrap"
-                style={{
-                  x: textTopX,
-                  opacity: textTopOpacity,
-                  ...headTextStyle,
-                }}
-              >
-                It’s Time
-              </motion.h2>
+            {/* REMOVED: Sliding Text Animations (It's Time / To Level Up) were here */}
 
-              <motion.h2
-                className="absolute bottom-20 right-8 sm:bottom-12 sm:right-12 text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold will-change-transform whitespace-nowrap"
-                style={{
-                  x: textBottomX,
-                  opacity: textBottomOpacity,
-                  ...headTextStyle,
-                }}
-              >
-                To Level Up
-              </motion.h2>
-            </div>
-
-            {/* Play Button (Large, Initial) */}
-            {/* REMOVED this entire block */}
-
-            {/* Custom Controls (Small, Centered, Auto-hide) */}
-            {/* CHANGED: Removed '!showPlayButton' check */}
+            {/* Custom Controls */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: showControls ? 1 : 0 }}
               transition={{ duration: 0.3 }}
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 flex items-center gap-4 bg-black/50 backdrop-blur-sm p-3 rounded-full shadow-lg pointer-events-auto"
-              onClick={(e) => e.stopPropagation()} // Clicks on the control bar itself shouldn't bubble
+              onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={togglePlayPause}
