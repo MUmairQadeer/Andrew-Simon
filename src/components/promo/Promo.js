@@ -2,10 +2,10 @@ import React, { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import PromoVideo from './Promo.mp4';
 import VIDEO_THUMBNAIL from './video-thumbnail.png';
-// --- Config ---
 
+// --- Config ---
 const TYPING_WORDS = ["Pitch", "Speech", "Presentation", "Moment", "Talk"];
-const FONT_FAMILY = 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"';
+const FONT_FAMILY = 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif';
 
 // --- Gradient Text Style ---
 const headTextStyle = {
@@ -16,50 +16,28 @@ const headTextStyle = {
   textFillColor: 'transparent',
 };
 
-// --- SVG Icons for Controls ---
+// --- SVG Icons ---
 const PlayIcon = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3l14 9-14 9V3z" />
+  <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+    <path d="M8 5v14l11-7z" />
   </svg>
 );
 
 const PauseIcon = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6" />
+  <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
   </svg>
 );
 
 const MuteIcon = ({ className = "w-6 h-6" }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
-    <line x1="22" y1="9" x2="16" y2="15" />
-    <line x1="16" y1="9" x2="22" y2="15" />
+  <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+    <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
   </svg>
 );
 
 const UnmuteIcon = ({ className = "w-6 h-6" }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
-    <path d="M16 9a5 5 0 0 1 0 6" />
-    <path d="M19.364 18.364a9 9 0 0 0 0-12.728" />
+  <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
   </svg>
 );
 
@@ -93,10 +71,7 @@ const TypingEffect = () => {
   }, [text, isDeleting, wordIndex]);
 
   return (
-    <span
-      className="inline-block transition-all duration-100 min-h-[1em]"
-      style={headTextStyle}
-    >
+    <span className="inline-block transition-all duration-100 min-h-[1em]" style={headTextStyle}>
       {text}
       <span className="opacity-50 animate-pulse" style={{ color: '#764ba2' }}>_</span>
     </span>
@@ -106,62 +81,82 @@ const TypingEffect = () => {
 // --- Main Cinematic Promo ---
 export default function CinematicPromo() {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const [showControls, setShowControls] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  
   const videoRef = useRef(null);
   const targetRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
+
+  // --- 1. Detect Screen Size ---
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: targetRef,
     offset: ["start start", "end end"],
   });
 
-  // --- Animation keyframes ---
-  const TEXT_FADE_OUT_END = 0.4;
-  const CARD_ANIMATION_START = 0.0;
-  const CARD_ANIMATION_END = 0.7;
+  // --- 2. Animations Config ---
+  const TEXT_FADE_OUT_END = 0.3;
+  const CARD_ANIMATION_END = 0.8;
 
-  // Hero text moves up and fades
   const text1Y = useTransform(scrollYProgress, [0, TEXT_FADE_OUT_END], ["0vh", "-50vh"]);
   const text1Opacity = useTransform(scrollYProgress, [0, TEXT_FADE_OUT_END], [1, 0]);
 
-  // Video card position & scale
-  // CHANGED: Maximum scale changed from 1 to 0.75
-  const videoCardY = useTransform(scrollYProgress, [CARD_ANIMATION_START, CARD_ANIMATION_END], ["60vh", "0vh"]);
-  const videoCardScale = useTransform(scrollYProgress, [CARD_ANIMATION_START, CARD_ANIMATION_END], [0.5, 0.75]);
+  // --- Video Scaling & Positioning ---
+  const targetScale = isMobile ? 0.95 : 0.75; 
+  const initialScale = isMobile ? 0.6 : 0.5;
+  
+  const initialY = isMobile ? "15vh" : "60vh";
 
-  // Dark overlay opacity
-  const overlayOpacity = useTransform(scrollYProgress, [0.4, CARD_ANIMATION_END], [0, 0.6]);
+  const videoCardY = useTransform(
+    scrollYProgress, 
+    [0, CARD_ANIMATION_END], 
+    [initialY, "0vh"]
+  );
+  
+  const videoCardScale = useTransform(
+    scrollYProgress, 
+    [0, CARD_ANIMATION_END], 
+    [initialScale, targetScale]
+  );
 
-  // --- Controls Visibility Logic ---
+  const overlayOpacity = useTransform(scrollYProgress, [0.4, CARD_ANIMATION_END], [0, 0.4]);
+
+  // --- Controls Logic ---
   const showAndAutoHideControls = () => {
-    if (controlsTimeoutRef.current) {
-      clearTimeout(controlsTimeoutRef.current);
-    }
+    if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
     setShowControls(true);
-    controlsTimeoutRef.current = setTimeout(() => {
-      setShowControls(false);
-    }, 2000);
+    controlsTimeoutRef.current = setTimeout(() => setShowControls(false), 2500);
   };
 
-  // --- Video Control Handlers ---
-  const togglePlayPause = async (e) => {
-    e.stopPropagation();
+  const handleVideoAction = async (e) => {
+    if(e) e.stopPropagation();
     showAndAutoHideControls();
+
     if (videoRef.current) {
+      if (videoRef.current.muted && isMuted) {
+        videoRef.current.muted = false;
+        setIsMuted(false);
+      }
       try {
         if (videoRef.current.paused) {
           await videoRef.current.play();
+          setIsPlaying(true);
         } else {
           videoRef.current.pause();
+          setIsPlaying(false);
         }
       } catch (err) {
-        if (err.name === 'AbortError') {
-          console.log("Video toggle aborted");
-        } else {
-          console.error("Error toggling video:", err);
-        }
+        console.error("Playback error:", err);
       }
     }
   };
@@ -176,44 +171,22 @@ export default function CinematicPromo() {
     }
   };
 
-  const handleVideoContainerClick = async () => {
-    showAndAutoHideControls();
-    if (videoRef.current) {
-      try {
-        if (videoRef.current.muted) {
-          videoRef.current.muted = false;
-          setIsMuted(false);
-        }
-        if (videoRef.current.paused) {
-          await videoRef.current.play();
-        } else {
-          videoRef.current.pause();
-        }
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          console.error("Error toggling video:", err);
-        }
-      }
-    }
-  };
-
   return (
     <div
       ref={targetRef}
-      className="h-[300vh] relative"
+      className="relative h-[150vh] md:h-[300vh]"
       style={{ fontFamily: FONT_FAMILY }}
     >
-      {/* Sticky Stage */}
       <div className="sticky top-0 h-screen w-full overflow-hidden"
         style={{ background: 'linear-gradient(180deg, #000000 20%, #2a2a4e 100%)' }}
       >
 
-        {/* Hero Text (Initial Title) */}
+        {/* Hero Text */}
         <motion.div
           style={{ y: text1Y, opacity: text1Opacity }}
-          className="absolute inset-0 z-30 flex items-center justify-center will-change-transform"
+          className="absolute inset-0 z-30 flex flex-col items-center justify-start md:justify-center pt-16 md:pt-0 pointer-events-none"
         >
-          <h1 className="text-white text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-center leading-tight">
+          <h1 className="text-white text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-center leading-tight drop-shadow-2xl mb-2 md:mb-0">
             Make Your
             <br />
             <TypingEffect />
@@ -222,64 +195,67 @@ export default function CinematicPromo() {
           </h1>
         </motion.div>
 
-        {/* Video Card */}
+        {/* Video Card Container */}
         <motion.div
           style={{ y: videoCardY, scale: videoCardScale }}
           className="absolute top-0 w-full h-full flex items-center justify-center will-change-transform"
         >
+          {/* Mobile height h-[55vh] */}
           <div
-            className="relative w-full h-full overflow-hidden rounded-lg cursor-pointer"
-            onClick={handleVideoContainerClick}
+            className="relative w-full h-[55vh] md:w-[90%] md:h-[90%] overflow-hidden rounded-2xl shadow-2xl cursor-pointer group"
+            onClick={(e) => handleVideoAction(e)}
           >
-            {/* Video */}
             <video
               ref={videoRef}
-              className="w-full h-full object-cover"
-              controls={false}
+              className="w-full h-full object-cover" 
               playsInline
+              webkit-playsinline="true"
               muted={isMuted}
               loop
               poster={VIDEO_THUMBNAIL}
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
-              onEnded={() => {
-                setIsPlaying(false);
-                if (controlsTimeoutRef.current) {
-                  clearTimeout(controlsTimeoutRef.current);
-                }
-                setShowControls(true);
-              }}
+              onEnded={() => setShowControls(true)}
             >
               <source src={PromoVideo} type="video/mp4" />
               Your browser does not support HTML video.
             </video>
 
-            {/* Dark overlay */}
-            <motion.div style={{ opacity: overlayOpacity }} className="absolute inset-0 bg-black z-10 will-change-transform" />
+            <motion.div 
+              style={{ opacity: overlayOpacity }} 
+              className="absolute inset-0 bg-black/40 pointer-events-none z-10" 
+            />
 
-            {/* REMOVED: Sliding Text Animations (It's Time / To Level Up) were here */}
-
-            {/* Custom Controls */}
+            {/* Custom Controls Bar */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: showControls ? 1 : 0 }}
+              // Re-added 'y' animation for a nice slide up effect since it's bottom-anchored again
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ 
+                opacity: showControls ? 1 : 0, 
+                y: showControls ? 0 : 20 
+              }}
               transition={{ duration: 0.3 }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 flex items-center gap-4 bg-black/50 backdrop-blur-sm p-3 rounded-full shadow-lg pointer-events-auto"
-              onClick={(e) => e.stopPropagation()}
+              // CHANGE HERE: Removed all md: classes that were centering it.
+              // It is now strictly 'absolute bottom-6 left-6' for ALL screens.
+              className="absolute bottom-6 left-6 z-30 flex items-center gap-6 bg-black/60 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 shadow-2xl pointer-events-auto"
+              onClick={(e) => e.stopPropagation()} 
             >
               <button
-                onClick={togglePlayPause}
-                className="text-white p-2 rounded-full transition-colors hover:bg-white/30"
+                onClick={(e) => handleVideoAction(e)}
+                className="text-white hover:text-purple-400 transition-colors transform active:scale-95"
                 aria-label={isPlaying ? "Pause" : "Play"}
               >
-                {isPlaying ? <PauseIcon /> : <PlayIcon />}
+                {isPlaying ? <PauseIcon className="w-8 h-8" /> : <PlayIcon className="w-8 h-8" />}
               </button>
+              
+              <div className="w-px h-6 bg-white/20"></div>
+
               <button
                 onClick={toggleMute}
-                className="text-white p-2 rounded-full transition-colors hover:bg-white/30"
+                className="text-white hover:text-purple-400 transition-colors transform active:scale-95"
                 aria-label={isMuted ? "Unmute" : "Mute"}
               >
-                {isMuted ? <MuteIcon /> : <UnmuteIcon />}
+                {isMuted ? <MuteIcon className="w-8 h-8" /> : <UnmuteIcon className="w-8 h-8" />}
               </button>
             </motion.div>
 
