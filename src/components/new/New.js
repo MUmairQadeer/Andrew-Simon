@@ -102,7 +102,7 @@ function StickyScrollFeature() {
   const scrollTimeout = useRef(null);
   const { scrollYProgress } = useScroll({ target: scrollRef, offset: ["start 0.1", "end 1"] });
 
-  // map scroll to section (when user scrolls)
+  // Map scroll to section
   useEffect(() => {
     const unsubscribe = scrollYProgress.onChange((latest) => {
       if (isClickScrolling) return;
@@ -113,19 +113,17 @@ function StickyScrollFeature() {
     return () => unsubscribe();
   }, [scrollYProgress, isClickScrolling]);
 
-  // initialize player for a specific index (called on iframe load)
+  // Initialize Vimeo players
   const initPlayer = (index) => {
     const iframe = iframeRefs.current[index];
     if (!iframe) return;
-    if (players.current[index]) return; // already created
+    if (players.current[index]) return;
 
     try {
       const p = new Player(iframe, { autopause: false });
-      // ensure muted for autoplay
       p.setVolume(0).catch(() => { });
       players.current[index] = p;
 
-      // If this is the active section, play it immediately on load
       if (index === activeSection) {
         p.play().catch(() => { });
       }
@@ -134,7 +132,7 @@ function StickyScrollFeature() {
     }
   };
 
-  // when activeSection changes -> play active and pause others
+  // Sync Play/Pause with active section
   useEffect(() => {
     players.current.forEach((p, i) => {
       if (!p) return;
@@ -146,7 +144,7 @@ function StickyScrollFeature() {
     });
   }, [activeSection]);
 
-  // click heading to scroll
+  // Click heading to scroll logic
   const handleHeadingClick = (index) => {
     setActiveSection(index);
     setIsClickScrolling(true);
@@ -164,50 +162,42 @@ function StickyScrollFeature() {
     }
   };
 
-  // toggle play/pause on the currently active player's video
+  // Toggle play/pause on click (Video Overlay)
   const togglePlayPauseActive = async () => {
     const p = players.current[activeSection];
     if (!p) return;
-
     try {
       const isPaused = await p.getPaused();
-      if (isPaused) {
-        await p.play();
-      } else {
-        await p.pause();
-      }
+      if (isPaused) await p.play();
+      else await p.pause();
     } catch (e) {
-      // ignore errors (autoplay policies, etc.)
-      try {
-        // fallback: if getPaused not available, try to call play then pause
-        await p.play();
-      } catch { }
+      try { await p.play(); } catch { }
     }
   };
 
-  // make sure iframeRefs.current has correct length
   const setIframeRef = (el, i) => {
     iframeRefs.current[i] = el;
   };
 
   return (
     <div ref={scrollRef} className="relative" style={{ height: `${featureData.length * 100}vh` }}>
+      
       <div
-        className="sticky w-full overflow-hidden md:h-[90vh] h-[105vh]"
-        style={{ backgroundColor: colors.primaryBlue, color: colors.lightText, top: "10vh", 
-          // height: "90vh"
-
-         }}
+        className="sticky w-full min-h-screen h-auto md:h-[90vh] md:overflow-hidden overflow-visible"
+        style={{
+          backgroundColor: colors.primaryBlue, color: colors.lightText, top: "10vh",
+        }}
       >
-        <div className="max-w-7xl mx-auto h-full md:grid md:grid-cols-3 gap-6 md:gap-12 lg:gap-24 md:items-center px-6 md:px-8">
-          {/* LEFT COLUMN */}
+        <div className="max-w-7xl mx-auto h-full md:grid md:grid-cols-3 gap-6 md:gap-8 lg:gap-24 md:items-center px-4 md:px-6 lg:px-8">
+          
+          {/* LEFT COLUMN (Headings) */}
           <div className="flex flex-col justify-center py-8 md:h-[80vh] md:col-span-1">
-            <div className="flex flex-col h-full justify-between md:pl-24">
-              <div className="space-y-10 w-fit">
+            <div className="flex flex-col h-full justify-between pl-4 sm:pl-12 md:pl-0 lg:pl-12">
+              <div className="space-y-6 sm:space-y-10 w-fit">
                 {featureData.map((item, index) => (
                   <h2
                     key={index}
-                    className="text-4xl xl:text-5xl font-extrabold cursor-pointer transition-all duration-300"
+                    className="text-3xl sm:text-4xl xl:text-5xl font-extrabold cursor-pointer transition-all duration-300"
                     style={{
                       color: activeSection === index ? colors.lightText : "rgba(249, 250, 251, 0.5)",
                       opacity: activeSection === index ? 1 : 0.7,
@@ -219,10 +209,11 @@ function StickyScrollFeature() {
                 ))}
               </div>
 
+              {/* Desktop Button */}
               <div className="hidden md:block w-fit">
                 <p className="text-xs text-gray-300">All services supported by our money-back 100% satisfaction guarantee.</p>
                 <motion.a
-                  className="font-semibold text-[0.9rem] py-2 px-5 rounded-full mt-4 sm:mt-6 shadow-lg inline-block"
+                  className="font-semibold text-[0.9rem] py-2 px-5 rounded-full mt-4 sm:mt-6 shadow-lg inline-block whitespace-nowrap"
                   style={{ backgroundImage: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", color: colors.lightText }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -236,10 +227,11 @@ function StickyScrollFeature() {
             </div>
           </div>
 
-          {/* RIGHT COLUMN */}
+          {/* RIGHT COLUMN (Video Card) */}
           <div className="md:col-span-2 w-full flex md:h-[80vh] items-center md:justify-center">
-            <div className="w-full md:w-[80%] h-[45vh] md:h-full rounded-2xl overflow-hidden shadow-2xl mx-auto relative">
-              {/* VIDEOS - ALL IFRAMEs MOUNTED WITH STABLE keys */}
+            <div className="w-full sm:w-[90%] md:w-full lg:w-[90%] min-h-[500px] h-[60vh] sm:h-[65vh] md:h-full rounded-2xl overflow-hidden shadow-2xl mx-auto relative">
+              
+              {/* VIDEO LAYER */}
               <div className="absolute inset-0 w-full h-full overflow-hidden" aria-hidden="true">
                 {featureData.map((item, index) => (
                   <iframe
@@ -256,8 +248,8 @@ function StickyScrollFeature() {
                       top: "50%",
                       left: "50%",
                       transform: "translate(-50%, -50%)",
-                      width: "150%",
-                      height: "150%",
+                      width: "170%", 
+                      height: "170%",
                       pointerEvents: "none",
                       opacity: activeSection === index ? 1 : 0,
                       transition: "opacity 0.4s ease",
@@ -266,13 +258,8 @@ function StickyScrollFeature() {
                 ))}
               </div>
 
-              {/* Semi-transparent black overlay */}
-              <div
-                className="absolute inset-0 bg-black opacity-50 z-10"
-                aria-hidden="true"
-              ></div>
-
-              {/* click overlay that toggles play/pause */}
+              {/* OVERLAYS */}
+              <div className="absolute inset-0 bg-black opacity-50 z-10" aria-hidden="true"></div>
               <div
                 className="absolute inset-0 z-30"
                 style={{ cursor: "pointer" }}
@@ -280,18 +267,19 @@ function StickyScrollFeature() {
                 aria-hidden={false}
               />
 
-              {/* BULLETS */}
+              {/* BULLET TEXT LAYER */}
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeSection}
-                  className="relative w-full h-full flex flex-col justify-start md:justify-center"
+                  className="relative w-full h-full z-20 pointer-events-none" 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.5 }}
                 >
                   <motion.ul
-                    className="relative z-20 flex flex-col px-6 pt-12 sm:p-8 md:p-12 text-white"
+                    // UPDATED: Added heavy horizontal padding so text stays on video
+                    className="flex flex-col h-full justify-evenly px-10 sm:px-16 md:px-20 lg:px-24 text-white"
                     variants={listVariants}
                     initial="hidden"
                     animate="visible"
@@ -300,10 +288,10 @@ function StickyScrollFeature() {
                       <motion.li
                         key={i}
                         variants={itemVariants}
-                        className="text-base sm:text-lg md:text-xl font-extrabold mb-6 md:mb-20 last:mb-0 flex items-start"
+                        className="text-sm md:text-base lg:text-xl font-extrabold flex items-start leading-relaxed break-words"
                         style={{ textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}
                       >
-                        <div className="w-7 h-7 md:w-8 md:h-8 mr-3 flex-shrink-0">
+                        <div className="w-5 h-5 md:w-6 md:h-6 lg:w-8 lg:h-8 mr-3 flex-shrink-0 mt-1">
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" className="w-full h-full">
                             <path
                               fillRule="evenodd"
@@ -323,16 +311,16 @@ function StickyScrollFeature() {
           </div>
 
           {/* MOBILE BUTTON */}
-          <div className="inline-block md:hidden pt-4 pb-20 flex flex-col  items-center w-full">
-            <p className="text-sm text-gray-300 px-4">All services supported by our money-back 100% satisfaction guarantee.</p>
+          <div className="inline-block md:hidden pt-6 pb-20 flex flex-col items-center w-full">
+            <p className="text-xs text-gray-300 px-4 text-center">All services supported by our money-back 100% satisfaction guarantee.</p>
             <motion.a
-              className="font-semibold text-[1rem] py-2 px-4 rounded-full mt-4 shadow-lg w-[95%] text-center "
+              className="font-semibold text-sm sm:text-base py-3 px-8 rounded-full mt-4 shadow-lg w-auto min-w-[200px] text-center whitespace-nowrap"
               style={{ backgroundImage: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", color: colors.lightText }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-                href="https://calendly.com/speak-with-simon/discovery-session"
-                  target="_blank"
-                  rel="noopener noreferrer"
+              href="https://calendly.com/speak-with-simon/discovery-session"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               Book Your Free Session
             </motion.a>
@@ -343,8 +331,7 @@ function StickyScrollFeature() {
   );
 }
 
-/* -------------------------    Export Main Component    ------------------------- */
-export default function New() {
+export default function Better() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: colors.primaryBlue }}>
       <HeroSection />
